@@ -1,0 +1,3 @@
+[submodule "PyGEM"]
+	path = PyGEM
+	url = https://github.com/PyGEM-Community/PyGEM.git
