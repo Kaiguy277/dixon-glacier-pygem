@@ -53,6 +53,17 @@ ENV/
 *.nc
 *.grib
 
+# Large PyGEM input files
+inputs/flowlines/
+inputs/thickness/
+*.tif
+*.tif.aux.xml
+*.pkl
+*.tar.gz
+
+# Shapefiles (can be regenerated)
+outlines.*
+
 # Jupyter
 .ipynb_checkpoints/
 
