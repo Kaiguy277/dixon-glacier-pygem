@@ -1,0 +1,190 @@
+#########################################################
+### Dixon Glacier PyGEM Configuration File ###########
+#########################################################
+
+# ===== ROOT PATH =====
+root: /Users/kaimyers/PygemRound2/data/
+
+# ===== USER INFO =====
+user:
+  name: Dixon Glacier Project
+  institution: PyGEM Analysis
+  email: user@example.com
+
+# ===== GLACIER SELECTION =====
+setup:
+  rgi_region01:
+    - 1
+  glac_no_skip: null
+  glac_no: 
+    - 1.20947                                           # Dixon Glacier specific
+  min_glac_area_km2: 0
+  include_landterm: true
+  include_laketerm: true
+  include_tidewater: true
+  include_frontalablation: true
+
+# ===== OGGM SETTINGS =====
+oggm:
+  base_url: https://cluster.klima.uni-bremen.de/~oggm/gdirs/oggm_v1.6/L1-L2_files/elev_bands/
+  logging_level: WORKFLOW
+  border: 240                                           # Large border for long-term runs to 2150
+  oggm_gdir_relpath: /oggm_gdirs/
+  overwrite_gdirs: true                                 # Force fresh download of glacier data
+  has_internet: true
+
+# ===== CLIMATE DATA AND TIME PERIODS =====
+climate:
+  # Reference period runs (calibration period)
+  ref_climate_name: ERA5
+  ref_startyear: 2000
+  ref_endyear: 2024                                     # Updated to include recent data
+  ref_wateryear: calendar
+  # Future simulation period
+  sim_climate_name: ERA5                               # Use ERA5 with automatic extended data detection
+  sim_climate_scenario: null
+  sim_startyear: 2000
+  sim_endyear: 2100                                     # Extended simulation to 2100
+  sim_wateryear: calendar
+  constantarea_years: 0
+  # Climate data paths
+  paths:
+    era5_relpath: /climate_data/ERA5_real_extended/
+    era5_temp_fn: ERA5_temp_monthly.nc
+    era5_tempstd_fn: ERA5_tempstd_monthly.nc
+    era5_prec_fn: ERA5_totalprecip_monthly.nc
+    era5_elev_fn: ERA5_geopotential.nc
+    era5_pressureleveltemp_fn: ERA5_pressureleveltemp_monthly.nc
+    era5_lr_fn: ERA5_lapserates_monthly.nc
+    
+    # Extended ERA5 + SSP245 (2000-2100)
+    era5_extended_relpath: /climate_data/ERA5_extended/
+    era5_extended_temp_fn: ERA5_extended_temp_monthly.nc
+    era5_extended_tempstd_fn: ERA5_extended_tempstd_monthly.nc
+    era5_extended_prec_fn: ERA5_extended_totalprecip_monthly.nc
+    era5_extended_elev_fn: ERA5_extended_geopotential.nc
+    era5_extended_pressureleveltemp_fn: ERA5_extended_pressureleveltemp_monthly.nc
+    era5_extended_lr_fn: ERA5_extended_lapserates_monthly.nc
+    
+    # CMIP6 Climate Projections (2025-2150)
+    ssp245_relpath: /climate_data/CMIP6/SSP245/
+    ssp245_temp_fn: CMIP6_SSP245_temp_monthly.nc
+    ssp245_tempstd_fn: CMIP6_SSP245_tempstd_monthly.nc
+    ssp245_prec_fn: CMIP6_SSP245_totalprecip_monthly.nc
+    ssp245_elev_fn: CMIP6_SSP245_geopotential.nc
+    ssp245_pressureleveltemp_fn: CMIP6_SSP245_pressureleveltemp_monthly.nc
+    ssp245_lr_fn: CMIP6_SSP245_lapserates_monthly.nc
+
+# ===== CALIBRATION OPTIONS =====
+calib:
+  option_calibration: HH2015mod                        # Start with simpler method for initial testing
+  priors_reg_fn: null
+
+  # HH2015mod parameters for initial testing
+  HH2015mod_params:
+    tbias_init: 0
+    tbias_step: 0.5
+    kp_init: 1
+    kp_bndlow: 0.5
+    kp_bndhigh: 3
+    ddfsnow_init: 0.0041
+    method_opt: SLSQP
+    params2opt:
+      - tbias
+      - kp
+    ftol_opt: 1e-3
+    eps_opt: 0.01
+
+  # Mass balance data - using Dixon surface change data
+  data:
+    massbalance:
+      hugonnet2021_relpath: /DEMs/                      # Path to mass balance data
+      hugonnet2021_fn: dixon_surface_change_mb.csv     # Dixon surface change data formatted for PyGEM
+      hugonnet2021_facorrected_fn: dixon_surface_change_mb_facorrected.csv   # For future frontal ablation corrections
+
+# ===== SIMULATION =====
+sim:
+  option_dynamics: MassRedistributionCurves            # As requested
+  option_bias_adjustment: 1
+  nsims: 1
+  # Output options
+  out:
+    sim_stats:
+      - median
+      - mad
+    export_all_simiters: false
+    export_extra_vars: true                             # Export for peak water analysis
+    export_binned_data: false
+    export_binned_components: false
+    export_binned_area_threshold: 0
+  # Mass redistribution curve parameters
+  icethickness_advancethreshold: 5
+  terminus_percentage: 20
+  # Model parameters (will be calibrated)
+  params:
+    use_constant_lapserate: false
+    kp: 1
+    tbias: 0
+    ddfsnow: 0.0041
+    ddfsnow_iceratio: 0.7
+    precgrad: 0.0001
+    lapserate: -0.0065
+    tsnow_threshold: 1
+
+# ===== MASS BALANCE MODEL OPTIONS =====
+mb:
+  option_surfacetype_initial: 1
+  include_firn: true
+  include_debris: false                                 # No debris data for Dixon
+  option_elev_ref_downscale: Zmed
+  option_adjusttemp_surfelev: 1
+  option_preclimit: 0
+  option_accumulation: 2
+  option_ablation: 1
+  option_ddf_firn: 1
+  option_refreezing: Woodward
+  Woodard_rf_opts:
+    rf_month: 10
+
+# ===== RGI GLACIER DATA =====
+rgi:
+  rgi_relpath: /RGI/rgi60/00_rgi60_attribs/
+  rgi_lat_colname: CenLat
+  rgi_lon_colname: CenLon_360
+  elev_colname: elev
+  indexname: GlacNo
+  rgi_O1Id_colname: glacno
+  rgi_glacno_float_colname: RGIId_float
+  rgi_cols_drop:
+    - GLIMSId
+    - BgnDate
+    - EndDate
+    - Status
+    - Linkages
+    - Name
+
+# ===== MODEL TIME PERIOD DETAILS =====
+time:
+  option_leapyear: 0
+  startmonthday: 06-01
+  endmonthday: 05-31
+  wateryear_month_start: 10
+  winter_month_start: 10
+  summer_month_start: 5
+  timestep: monthly
+
+# ===== MODEL CONSTANTS =====
+constants:
+  density_ice: 900
+  density_water: 1000
+  k_ice: 2.33
+  k_air: 0.023
+  ch_ice: 1890000
+  ch_air: 1297
+  Lh_rf: 333550
+  tolerance: 1.0e-12
+
+# ===== DEBUGGING OPTIONS =====
+debug:
+  refreeze: false
+  mb: false
