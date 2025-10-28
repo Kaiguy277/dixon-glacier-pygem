@@ -57,6 +57,7 @@ ENV/
 inputs/flowlines/
 inputs/thickness/
 *.tif
+*.TIF
 *.tif.aux.xml
 *.pkl
 *.tar.gz
