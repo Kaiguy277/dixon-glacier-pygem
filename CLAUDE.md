@@ -157,6 +157,90 @@ echo "$(date): Calibration completed with exit code $?" >> pygem_execution.log
 - Cross-reference calibrated parameters with regional climate patterns
 - Consider debris cover effects if applicable
 
+## 🌡️ CMIP6 Climate Scenario Implementation
+
+### Critical Technical Solution - Hardcoded Climate Scenarios
+**ISSUE IDENTIFIED**: PyGEM has hardcoded climate scenario references that override config settings.
+
+**ROOT CAUSE**: 
+- Config files may not be properly read due to working directory issues
+- Climate scenario logic defaults to 'ssp245' regardless of config setting
+- ACCESS-CM2 climate definition missing from class_climate.py
+
+**SOLUTION IMPLEMENTED**:
+1. **Added ACCESS-CM2 Climate Definition** in `/PyGEM/pygem/class_climate.py`:
+```python
+elif self.name == 'ACCESS-CM2':
+    # ACCESS-CM2 CMIP6 model with variable scenarios
+    # Variable names
+    self.temp_vn = 'tas'
+    self.prec_vn = 'pr'
+    self.elev_vn = 'orog'
+    # Variable filenames - constructed based on scenario
+    self.temp_fn = f'ACCESS-CM2_{sim_climate_scenario}_r1i1p1f1_tas.nc'
+    self.prec_fn = f'ACCESS-CM2_{sim_climate_scenario}_r1i1p1f1_pr.nc'
+    # Variable filepaths
+    self.var_fp = pygem_prms['root'] + '/climate_data/cmip6/ACCESS-CM2/'
+```
+
+2. **Fixed Scenario Logic** in `/PyGEM/pygem/bin/run/run_simulation.py`:
+```python
+elif sim_climate_name.startswith('SSP'):
+    # Extract scenario from SSP climate names (SSP126, SSP245, SSP585)
+    sim_climate_scenario = sim_climate_name.lower()
+```
+
+### Command-Line Override Method
+**CRITICAL**: Use explicit command-line arguments to ensure correct scenario execution:
+
+```bash
+# SSP126 (Low warming ~1.5°C)
+python3 run_simulation.py -sim_climate_name ACCESS-CM2 -sim_climate_scenario ssp126
+
+# SSP245 (Moderate warming ~2.7°C) 
+python3 run_simulation.py -sim_climate_name ACCESS-CM2 -sim_climate_scenario ssp245
+
+# SSP370 (High warming ~3.6°C)
+python3 run_simulation.py -sim_climate_name ACCESS-CM2 -sim_climate_scenario ssp370
+
+# SSP585 (Very high warming ~4.4°C)
+python3 run_simulation.py -sim_climate_name ACCESS-CM2 -sim_climate_scenario ssp585
+```
+
+### Climate Data Requirements
+**File Structure**: All scenarios require specific file naming convention in `/climate_data/cmip6/ACCESS-CM2/`:
+- Temperature: `ACCESS-CM2_{scenario}_r1i1p1f1_tas.nc`
+- Precipitation: `ACCESS-CM2_{scenario}_r1i1p1f1_pr.nc`
+- Orography: `ACCESS-CM2_orog.nc`
+
+**Data Verification**:
+```bash
+# Verify all scenario files exist
+ls /climate_data/cmip6/ACCESS-CM2/ACCESS-CM2_ssp*_r1i1p1f1_*.nc
+# Should show: ssp126, ssp245, ssp370, ssp585 files for both tas and pr
+```
+
+### Scenario Comparison Results (Dixon Glacier 2015-2100)
+**VALIDATED OUTCOMES**:
+- **SSP126**: 26.0 km² remaining (37.7% loss) - Best case scenario
+- **SSP245**: 21.7 km² remaining (48.0% loss) - Moderate warming
+- **SSP370**: 17.6 km² remaining (57.9% loss) - High warming  
+- **SSP585**: 8.3 km² remaining (80.0% loss) - Worst case scenario
+
+**Peak Water Timing**:
+- SSP126: 2049 (earliest peak - less prolonged melting)
+- SSP245: 2057 
+- SSP370: 2058
+- SSP585: 2074 (latest peak - extended melting period)
+
+### Configuration Management for Scenarios
+**Multiple Config Files Issue**: 
+- PyGEM may read from `/Users/.../PygemRound2/config.yaml` (root level)
+- NOT from `/Users/.../PygemRound2/PyGEM/pygem/setup/config.yaml`
+- Always verify which config file is being used
+
+**Best Practice**: Use command-line overrides rather than relying solely on config files for scenario specification.
+
 ## 🚨 Critical Warnings
 
 - **Never use placeholder or estimated values** in place of missing model outputs

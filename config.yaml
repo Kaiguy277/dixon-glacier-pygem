@@ -41,9 +41,9 @@ climate:
   ref_endyear: 2024                                     # Updated to include recent data
   ref_wateryear: calendar
   # Future simulation period
-  sim_climate_name: ERA5                               # Use ERA5 with automatic extended data detection
-  sim_climate_scenario: null
-  sim_startyear: 2000
+  sim_climate_name: ACCESS-CM2                         # CMIP6 GCM model
+  sim_climate_scenario: ssp126                         # CMIP6 SSP126 scenario (2015-2100)
+  sim_startyear: 2015
   sim_endyear: 2100                                     # Extended simulation to 2100
   sim_wateryear: calendar
   constantarea_years: 0
