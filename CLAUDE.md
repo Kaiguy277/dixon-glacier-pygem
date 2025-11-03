@@ -241,6 +241,130 @@ ls /climate_data/cmip6/ACCESS-CM2/ACCESS-CM2_ssp*_r1i1p1f1_*.nc
 
 **Best Practice**: Use command-line overrides rather than relying solely on config files for scenario specification.
 
+## 🔧 **PARAMETER SWEEP IMPLEMENTATION - CRITICAL FIXES**
+
+### 🚨 **Root Cause: Config File Override Issue**
+**ISSUE IDENTIFIED**: PyGEM ignores command-line parameters when `option_calibration` is set in config.yaml.
+
+**ROOT CAUSE**: 
+- Config file has `option_calibration: HH2015mod` which forces PyGEM to load pre-calibrated parameters
+- Command-line parameters (`-kp`, `-tbias`, `-ddfsnow`) are ignored when calibration option is active
+- This causes all parameter sweep runs to produce identical results
+
+### ✅ **SOLUTION IMPLEMENTED**: PyGEM Source Code Fix
+
+**Location**: `/PyGEM/pygem/bin/run/run_simulation.py` lines 686-691
+
+**Original Code**:
+```python
+if args.option_calibration:
+    # Load calibrated parameters (ignores command-line params)
+```
+
+**Fixed Code**:
+```python
+# PARAMETER SWEEP FIX: Check if command-line parameters are provided
+cmdline_params_provided = (args.kp is not None or 
+                         args.tbias is not None or 
+                         args.ddfsnow is not None)
+
+if args.option_calibration and not cmdline_params_provided:
+    # Load calibrated parameters only if no command-line params provided
+```
+
+**Debug Addition** (lines 832-834):
+```python
+# PARAMETER SWEEP FIX: Using command-line parameters
+if cmdline_params_provided and debug:
+    print(f"PARAMETER SWEEP: Using command-line parameters - kp={args.kp}, tbias={args.tbias}, ddfsnow={args.ddfsnow}")
+```
+
+### 📊 **VALIDATION RESULTS**: Parameter Sensitivity Confirmed
+
+**Test Results** (2015-2025 period):
+```
+Conservative (tbias=-3.0, kp=1.0, ddf=0.004): 41.42 → 34.70 km² (16.2% loss)
+Moderate     (tbias=-2.0, kp=1.5, ddf=0.005): 41.26 → 31.76 km² (23.0% loss)
+Aggressive   (tbias=-1.0, kp=2.0, ddf=0.006): 41.13 → 25.47 km² (38.1% loss)
+```
+
+**Before Fix**: All parameters produced identical 0.96 km² final area (97.7% loss)
+**After Fix**: Parameters produce realistic varied results (16.2% - 38.1% loss range)
+
+### 🎯 **WORKING PARAMETER SWEEP COMMAND TEMPLATE**
+
+```bash
+python3 /PyGEM/pygem/bin/run/run_simulation.py \
+    -kp [VALUE] \
+    -tbias [VALUE] \
+    -ddfsnow [VALUE] \
+    -rgi_glac_number 1.20947 \
+    -sim_startyear 2015 \
+    -sim_endyear 2100 \
+    -export_extra_vars \
+    -export_binned_data \
+    -outputfn_sfix _[UNIQUE_ID]
+```
+
+**Example Working Commands**:
+```bash
+# Conservative parameters
+python3 run_simulation.py -kp 1.0 -tbias -3.0 -ddfsnow 0.004 -rgi_glac_number 1.20947 -sim_startyear 2015 -sim_endyear 2100 -outputfn_sfix _conservative
+
+# Moderate parameters  
+python3 run_simulation.py -kp 1.5 -tbias -2.0 -ddfsnow 0.005 -rgi_glac_number 1.20947 -sim_startyear 2015 -sim_endyear 2100 -outputfn_sfix _moderate
+
+# Aggressive parameters
+python3 run_simulation.py -kp 2.0 -tbias -1.0 -ddfsnow 0.006 -rgi_glac_number 1.20947 -sim_startyear 2015 -sim_endyear 2100 -outputfn_sfix _aggressive
+```
+
+### 📋 **REALISTIC PARAMETER RANGES** (Literature-Based)
+
+**For Dixon Glacier Parameter Sweeps**:
+- **Temperature bias (tbias)**: -4.0°C to 0.0°C
+- **Precipitation factor (kp)**: 0.8 to 2.0  
+- **Degree-day factor (ddfsnow)**: 0.003 to 0.007 m°C⁻¹d⁻¹
+- **Lapse rate**: -0.0065°C/m (standard atmospheric)
+- **Precipitation gradient**: 0.0002 (moderate gradient)
+
+**Parameter Grid Recommendations**:
+- **Small test**: 3×3×3 = 27 combinations
+- **Full sweep**: 5×5×5 = 125 combinations
+- **Comprehensive**: 7×7×7 = 343 combinations
+
+### 🔍 **VERIFICATION CHECKLIST**
+
+**Before Running Parameter Sweep**:
+1. ✅ PyGEM source code fix applied to `run_simulation.py`
+2. ✅ Parameters specified via command-line (not config file)
+3. ✅ Unique output suffix for each run (`-outputfn_sfix`)
+4. ✅ Realistic parameter ranges selected
+5. ✅ Debug mode enabled for verification (`-v` flag)
+
+**Verification Commands**:
+```bash
+# Test single run with debug output
+python3 run_simulation.py -kp 1.5 -tbias -2.5 -ddfsnow 0.005 -rgi_glac_number 1.20947 -sim_startyear 2015 -sim_endyear 2020 -outputfn_sfix _test -v
+
+# Look for confirmation message in output:
+grep "PARAMETER SWEEP: Using command-line parameters" [output_log]
+```
+
+### ⚡ **PERFORMANCE EXPECTATIONS**
+
+**Timing**: ~10-40 seconds per simulation (2015-2100)
+**Success Rate**: 100% with realistic parameters and proper config
+**Output Files**: 2 per run (stats + binned NetCDF files)
+**File Sizes**: ~1-5 MB per simulation
+
+### 🚨 **CRITICAL SUCCESS INDICATORS**
+
+✅ **Different parameters produce different final glacier areas**
+✅ **Debug message confirms command-line parameter usage**
+✅ **Unique output files created with specified suffix**
+✅ **Results show realistic area loss ranges (not extreme 97%+ loss)**
+✅ **Parameter correlations show expected sensitivity patterns**
+
 ## 🚨 Critical Warnings
 
 - **Never use placeholder or estimated values** in place of missing model outputs
