@@ -15,6 +15,12 @@ data/
 output/
 Output/
 
+# Parameter sweep results (large datasets)
+ultra_reliable_sweep/results/
+comprehensive_large_sweep/results/
+observation_guided_sweep/results/
+parameter_sweep_working_results/
+
 # Python
 __pycache__/
 *.py[cod]
