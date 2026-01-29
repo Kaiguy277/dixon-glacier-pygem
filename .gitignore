@@ -10,12 +10,19 @@ venv/
 *.log
 
 # Large data directories (keep on external drive)
-data/
-analysis_results/
+/data/
 dixon_mega_sweep_data_archive/
 
-# Output graphs (generated, can regenerate)
-graphs/
+# Large TIF files (exceed GitHub 100MB limit)
+*.TIF
+inputs/thickness/*.tif
+
+# Large analysis CSV files (keep top_1000 and metadata, exclude full results)
+sweep_analysis_full_*.csv
+analysis_results/sweep_analysis_results.csv
+
+# Old test analysis directory (incomplete)
+graphs/analysis_20260128_112039/
 
 # IDE
 .idea/
