@@ -1,0 +1,183 @@
+# 4D Parameter Sweep - ACTUAL INPUT DATA (MEGA SWEEP 2023-2025)
+# Generated: 2026-01-14
+# Base Directory: /Users/kaimyers/PygemRound2
+
+## CRITICAL NOTE:
+## This reflects the ACTUAL data used in the mega sweep (24,000 runs, Dec 2025)
+## Time period: 2023-2025 (3 years only)
+## Climate: SNAP temperature + NUKA weather station precipitation
+
+================================================================================
+## REQUIRED FILES - Glacier Geometry
+================================================================================
+
+# Glacier Outline (36 KB total)
+inputs/RGI60-01.20947/outlines.shp
+inputs/RGI60-01.20947/outlines.dbf
+inputs/RGI60-01.20947/outlines.shx
+inputs/RGI60-01.20947/outlines.prj
+inputs/RGI60-01.20947/outlines.cpg
+
+# Ice Thickness (264 KB total)
+inputs/thickness/RGI60-01.20947_thickness.tif
+inputs/thickness/RGI60-01.20947_thickness.tif.aux.xml
+
+================================================================================
+## REQUIRED FILES - Calibration & Validation Data
+================================================================================
+
+# Surface Change DEM - Calibration (175 MB compressed, originally 399 MB)
+inputs/surface_change_2022_2023.TIF
+
+# Stake Observations - Validation (3 KB)
+inputs/stake_observations_dixon.csv
+
+================================================================================
+## REQUIRED FILES - Climate Data (2023-2025 SNAP + SNOTEL)
+================================================================================
+
+# PyGEM-Compatible NetCDF Files (189 MB total)
+# NOTE: Despite name "ERA5_real_extended", these contain SNAP + SNOTEL data
+# Time range: 2000-2100 in file, but PyGEM uses 2023-2025 subset only
+
+data/climate_data/ERA5_real_extended/ERA5_temp_monthly.nc              (27 MB)
+data/climate_data/ERA5_real_extended/ERA5_totalprecip_monthly.nc       (29 MB)
+data/climate_data/ERA5_real_extended/ERA5_geopotential.nc              (830 KB)
+data/climate_data/ERA5_real_extended/ERA5_lapserates_monthly.nc        (60 MB)
+data/climate_data/ERA5_real_extended/ERA5_tempstd_monthly.nc           (15 MB)
+data/climate_data/ERA5_real_extended/ERA5_pressureleveltemp_monthly.nc (57 MB)
+
+# Raw Source Data (What was used to create the above NetCDF files)
+data/climate_data/Dixon_raw/NUKA_2023_precip_daily.csv    (10 KB)  - Weather station precip
+data/climate_data/Dixon_raw/NUKA_2024_precip_daily.csv    (9.6 KB) - Weather station precip
+data/climate_data/Dixon_raw/NUKA_2025_precip_daily.csv    (13 KB)  - Weather station precip
+data/climate_data/Dixon_raw/Dixon24WX_RAW.csv             (78 KB)  - Weather station temp
+data/climate_data/Dixon_raw/Dixon25_temp.csv              (188 KB) - Weather station temp
+data/climate_data/Dixon_raw/CR1000XSeries_DIXON_25.xlsx   (176 KB) - Raw weather data
+
+# Combined CSV Format (Used for initial processing)
+data/climate_data/SNAP_SNOTEL_combined/dixon_climate_2023_2025.csv    (1.1 KB)
+data/climate_data/SNAP_SNOTEL_combined/dixon_climate_metadata.json    (495 B)
+
+================================================================================
+## Configuration & Code
+================================================================================
+
+# Main Configuration
+config.yaml
+
+# Parameter Sweep Framework (Standard - uses 2015-2100)
+command_line_parameter_sweep.py
+
+# Mega Sweep Framework (ACTUALLY USED - 2023-2025)
+run_dixon_mega_sweep_no_retry.py
+
+# Modified PyGEM (must have 3 critical modifications)
+PyGEM/pygem/bin/run/run_simulation.py
+
+# Data Preparation Script
+prepare_snap_snotel_climate_data.py
+
+================================================================================
+## AUTO-CREATED DIRECTORIES
+================================================================================
+
+# OGGM glacier data (auto-downloaded, 11 MB)
+data/oggm_gdirs/
+
+# Output directory (52 GB with existing outputs)
+data/Output/simulations/
+
+================================================================================
+## DATA SOURCE DETAILS
+================================================================================
+
+Temperature Data Source:
+  - SNAP Alaska 2km downscaled reanalysis
+  - Monthly resolution
+  - Period: 2023-2025 (36 months)
+  - Coordinate: 61.75°N, 153.5°W
+
+Precipitation Data Source:
+  - NUKA Glacier SNOTEL weather station
+  - Daily measurements aggregated to monthly
+  - Period: 2023-2025
+  - Location: On-glacier measurements
+
+Processing:
+  - Script: prepare_snap_snotel_climate_data.py
+  - Created: 2025-12-30
+  - Output format: PyGEM-compatible NetCDF files
+  - Placed in: data/climate_data/ERA5_real_extended/
+
+================================================================================
+## MEGA SWEEP EXECUTION DETAILS
+================================================================================
+
+Sweep Script: run_dixon_mega_sweep_no_retry.py
+Time Period: 2023-2025 (lines 106-107)
+  self.start_year = 2023
+  self.end_year = 2025
+
+Parameter Grid:
+  - tbias: 25 values (-10°C to +5°C)
+  - kp: 25 values (0.5 to 8.0)
+  - ddfsnow: 20 values (0.001 to 0.012 m°C⁻¹d⁻¹)
+  - ddfsnow_iceratio: 20 values (0.2 to 1.2)
+  - Total: 250,000 combinations
+
+Results:
+  - Attempted: 250,000 runs
+  - Completed: 23,979 runs (9.6% before stopping)
+  - Success rate: 97.9%
+  - Runtime: 231.6 hours (9.6 days)
+  - Speed: ~34.8 seconds per run
+  - Output location: /Volumes/Extreme SSD/dixon_mega_sweep_20251230_145907/
+
+================================================================================
+## TOTAL SIZE SUMMARY
+================================================================================
+
+Glacier geometry:         ~300 KB
+Calibration/validation:   ~175 MB
+Climate data (NetCDF):    ~189 MB
+Raw source data:          ~475 KB
+OGGM data:                ~11 MB
+Configuration/code:       ~60 KB
+------------------------
+REQUIRED TOTAL:           ~365 MB
+
+With outputs (24K runs):  ~50-100 GB additional
+
+================================================================================
+## COMPARISON: MEGA SWEEP vs STANDARD SWEEP
+================================================================================
+
+MEGA SWEEP (run_dixon_mega_sweep_no_retry.py):
+  ✅ Time period: 2023-2025 (3 years)
+  ✅ Climate: SNAP + NUKA weather station
+  ✅ Location: data/climate_data/ERA5_real_extended/
+  ✅ Purpose: Short-term parameter calibration with on-glacier observations
+
+STANDARD SWEEP (command_line_parameter_sweep.py):
+  ✅ Time period: 2015-2100 (86 years)
+  ✅ Climate: ACCESS-CM2 CMIP6 projections
+  ✅ Location: inputs/CMIP6/SSP245_*/
+  ✅ Purpose: Long-term climate projections and peak water analysis
+
+================================================================================
+## NOTES FOR FRESH SETUP
+================================================================================
+
+To reproduce the MEGA SWEEP (2023-2025):
+1. ✅ Copy all files listed above
+2. ✅ Ensure data/climate_data/ERA5_real_extended/ contains the 2023-2025 SNAP+SNOTEL data
+3. ✅ Use run_dixon_mega_sweep_no_retry.py (NOT command_line_parameter_sweep.py)
+4. ✅ Verify config.yaml has: era5_relpath: /climate_data/ERA5_real_extended/
+
+To run STANDARD SWEEP (2015-2100):
+1. ✅ Copy inputs/CMIP6/SSP245_*/ files
+2. ✅ Use command_line_parameter_sweep.py
+3. ✅ Will simulate full 2015-2100 projections
+
+================================================================================

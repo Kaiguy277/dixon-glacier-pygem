@@ -1,0 +1,186 @@
+# 4D Parameter Sweep - INPUT DATA FOR STANDARD SWEEP (2015-2100)
+# Generated: 2026-01-14
+# Base Directory: /Users/kaimyers/PygemRound2
+
+## CRITICAL NOTE:
+## This reflects data for STANDARD long-term projections (2015-2100)
+## For the MEGA SWEEP (2023-2025 SNAP+SNOTEL), see INPUT_DATA_PATHS_MEGA_SWEEP.txt
+## Framework: command_line_parameter_sweep.py
+
+================================================================================
+## REQUIRED FILES - Glacier Geometry (SAME FOR BOTH)
+================================================================================
+
+# Glacier Outline (36 KB total)
+inputs/RGI60-01.20947/outlines.shp
+inputs/RGI60-01.20947/outlines.dbf
+inputs/RGI60-01.20947/outlines.shx
+inputs/RGI60-01.20947/outlines.prj
+inputs/RGI60-01.20947/outlines.cpg
+
+# Ice Thickness (264 KB total)
+inputs/thickness/RGI60-01.20947_thickness.tif
+inputs/thickness/RGI60-01.20947_thickness.tif.aux.xml
+
+================================================================================
+## REQUIRED FILES - Calibration & Validation Data (SAME FOR BOTH)
+================================================================================
+
+# Surface Change DEM - Calibration (175 MB compressed)
+inputs/surface_change_2022_2023.TIF
+
+# Stake Observations - Validation (3 KB)
+inputs/stake_observations_dixon.csv
+
+================================================================================
+## REQUIRED FILES - Climate Data (2000-2024 ERA5 + 2015-2100 CMIP6)
+================================================================================
+
+# Historical Climate - ERA5 Reanalysis (2000-2025, ~90 MB total)
+# Note: These may not exist in inputs/ERA5/ - check data/climate_data/ERA5/
+inputs/ERA5/single_levels/data_stream-moda_stepType-avgad.nc  (precipitation)
+inputs/ERA5/single_levels/data_stream-moda_stepType-avgua.nc  (temp & elevation)
+inputs/ERA5/pressure_for_lapse_rates.nc                       (72 MB)
+inputs/ERA5/pressure_for _temp_std.nc                         (17 MB)
+
+# Future Climate - ACCESS-CM2 CMIP6 SSP245 (2015-2100, ~2 MB) - DEFAULT
+inputs/CMIP6/SSP245_near-surface-air-temp_2015to2100/tas_Amon_ACCESS-CM2_ssp245_r1i1p1f1_gn_20150116-21001216.nc  (1.0 MB)
+inputs/CMIP6/SSP245_precip_2015to2100/pr_Amon_ACCESS-CM2_ssp245_r1i1p1f1_gn_20150116-21001216.nc                 (1.2 MB)
+
+================================================================================
+## OPTIONAL FILES - Additional Climate Scenarios
+================================================================================
+
+# SSP126 - Low warming ~1.5°C (~2 MB)
+inputs/CMIP6/SSP126_near-surface-air-temp_2015to2100/tas_Amon_ACCESS-CM2_ssp126_r1i1p1f1_gn_20150116-21001216.nc  (1.0 MB)
+inputs/CMIP6/SSP126_precip_2015to2100/pr_Amon_ACCESS-CM2_ssp126_r1i1p1f1_gn_20150116-21001216.nc                 (1.2 MB)
+
+# SSP370 - High warming ~3.6°C (~2 MB)
+inputs/CMIP6/SSP370_near-surface-air-temp_2015to2100/tas_Amon_ACCESS-CM2_ssp370_r1i1p1f1_gn_20150116-21001216.nc  (1.0 MB)
+inputs/CMIP6/SSP370_precip_2015to2100/pr_Amon_ACCESS-CM2_ssp370_r1i1p1f1_gn_20150116-21001216.nc                 (1.2 MB)
+
+# SSP585 - Very high warming ~4.4°C (~2 MB)
+inputs/CMIP6/SSP585_near-surface-air-temp_2015to2100/tas_Amon_ACCESS-CM2_ssp585_r1i1p1f1_gn_20150116-21001216.nc  (1.0 MB)
+inputs/CMIP6/SSP585_precip_2015to2100/pr_Amon_ACCESS-CM2_ssp585_r1i1p1f1_gn_20150116-21001216.nc                 (1.2 MB)
+
+================================================================================
+## Configuration & Code
+================================================================================
+
+# Main Configuration
+config.yaml
+
+# Standard Parameter Sweep Framework (2015-2100)
+command_line_parameter_sweep.py
+
+# Modified PyGEM (must have 3 critical modifications)
+PyGEM/pygem/bin/run/run_simulation.py
+
+================================================================================
+## AUTO-CREATED DIRECTORIES
+================================================================================
+
+# OGGM glacier data (auto-downloaded)
+data/oggm_gdirs/
+
+# Output directory
+data/Output/simulations/
+
+================================================================================
+## EXECUTION DETAILS
+================================================================================
+
+Sweep Script: command_line_parameter_sweep.py
+Time Period: 2015-2100 (lines 356-357)
+  '-sim_startyear', '2015'
+  '-sim_endyear', '2100'
+
+Usage Examples:
+  # Quick test (5 runs)
+  python3 command_line_parameter_sweep.py --test 5
+
+  # Small sweep (~108 runs, ~15 minutes)
+  python3 command_line_parameter_sweep.py --small
+
+  # Medium sweep (~980 runs, ~2 hours)
+  python3 command_line_parameter_sweep.py --medium
+
+  # Large sweep (~4000 runs, ~8 hours)
+  python3 command_line_parameter_sweep.py --large
+
+Performance:
+  - Speed: 6-8 seconds per run (2015-2100)
+  - Success rate: 96.3%
+  - Output: 2 NetCDF files per run (stats + binned)
+
+================================================================================
+## TOTAL SIZE SUMMARY
+================================================================================
+
+Glacier geometry:         ~300 KB
+Calibration/validation:   ~175 MB
+ERA5 climate:             ~90 MB
+CMIP6 SSP245 (minimum):   ~2 MB
+All CMIP6 scenarios:      ~8 MB
+OGGM data:                ~11 MB
+Configuration/code:       ~60 KB
+------------------------
+REQUIRED TOTAL:           ~268 MB (SSP245 only)
+WITH ALL SCENARIOS:       ~274 MB
+
+With outputs (4000 runs):  ~20-40 GB additional
+
+================================================================================
+## CLIMATE DATA DETAILS
+================================================================================
+
+ERA5 Historical (Reference Period):
+  - Source: ECMWF ERA5 Reanalysis
+  - Time range: 2000-2025 (309 months)
+  - Spatial resolution: 0.25° (~31 km)
+  - Variables: Temperature, precipitation, geopotential, lapse rates
+  - Purpose: Model calibration against observations
+
+CMIP6 Future Projections:
+  - Model: ACCESS-CM2
+  - Time range: 2015-2100 (1032 months)
+  - Spatial resolution: ~250 km (regridded)
+  - Variables: Temperature (tas), precipitation (pr)
+  - Purpose: Long-term climate projections and peak water analysis
+
+Scenarios:
+  - SSP126: Low warming (~1.5°C by 2100)
+  - SSP245: Moderate warming (~2.7°C by 2100) [DEFAULT]
+  - SSP370: High warming (~3.6°C by 2100)
+  - SSP585: Very high warming (~4.4°C by 2100)
+
+================================================================================
+## NOTES FOR FRESH SETUP
+================================================================================
+
+Standard Sweep Setup:
+1. ✅ Copy all files listed above
+2. ✅ Ensure inputs/CMIP6/SSP245_*/ contains ACCESS-CM2 data
+3. ✅ Verify ERA5 data in appropriate location (check config.yaml)
+4. ✅ Use command_line_parameter_sweep.py
+5. ✅ Will simulate full 2015-2100 projections
+
+Config Requirements:
+  climate:
+    ref_climate_name: ERA5
+    ref_startyear: 2000
+    ref_endyear: 2024
+    sim_climate_name: ACCESS-CM2
+    sim_climate_scenario: ssp245
+    sim_startyear: 2015
+    sim_endyear: 2100
+
+================================================================================
+## SEE ALSO
+================================================================================
+
+- INPUT_DATA_PATHS_MEGA_SWEEP.txt - For 2023-2025 SNAP+SNOTEL mega sweep
+- SETUP_GUIDE_4D_PARAMETER_SWEEP.md - Complete setup documentation
+- DATA_BUNDLE_CHECKLIST.md - Step-by-step setup verification
+
+================================================================================

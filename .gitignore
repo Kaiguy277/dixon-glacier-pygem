@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+*.egg-info/
+
+# Logs
+*.log
+
+# Large data directories (keep on external drive)
+data/
+analysis_results/
+dixon_mega_sweep_data_archive/
+
+# Output graphs (generated, can regenerate)
+graphs/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

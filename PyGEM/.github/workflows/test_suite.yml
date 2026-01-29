@@ -1,0 +1,77 @@
+name: 'Install PyGEM and Run Test Suite'
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - '**.py'
+      - '.github/workflows/test_suite.yml'
+      - 'pyproject.toml'
+
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/test_suite.yml'
+      - 'pyproject.toml'
+
+  # Run test suite every Saturday at 1AM GMT (1 hour after the Docker image is updated)
+  schedule:
+    - cron: '0 1 * * 6'
+
+# Stop the workflow if a new one is started
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test_suite:
+    name: 'Test suite'
+    runs-on: ubuntu-latest
+    container:
+      # Use pygem:latest for master branch and pygem:dev otherwise
+      image: ghcr.io/pygem-community/pygem:${{ github.ref == 'refs/heads/master' && 'latest' || 'dev' }}
+      options: --user root
+    env:
+      # Since we are root we need to set PYTHONPATH to be able to find the installed packages
+      PYTHONPATH: /home/ubuntu/.local/lib/python3.12/site-packages
+
+    steps:
+      - name: 'Checkout the PyGEM repo'
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: 'Reinstall PyGEM'
+        run: pip install --break-system-packages -e .
+
+      - name: 'Run ruff linting check'
+        run: ruff check .
+
+      - name: 'Run ruff formatting check'
+        if: ${{ !cancelled() }}
+        run: ruff format . --check
+
+      - name: 'Initialize PyGEM'
+        run: initialize
+
+      - name: 'Clone the PyGEM-notebooks repo'
+        run: |
+          BRANCH=${GITHUB_REF#refs/heads/}
+          if [ "$BRANCH" = "main" ]; then
+            NOTEBOOK_BRANCH="main"
+          else
+            NOTEBOOK_BRANCH="dev"
+          fi
+          git clone --depth 1 --branch "$NOTEBOOK_BRANCH" https://github.com/pygem-community/PyGEM-notebooks.git
+          echo "PYGEM_NOTEBOOKS_DIRPATH=$(pwd)/PyGEM-notebooks" >> "$GITHUB_ENV"
+
+      - name: 'Run tests'
+        run: |
+          python3 -m coverage erase
+          # run each test file explicitly in the desired order
+          python3 -m pytest --cov=pygem -v --durations=20 pygem/tests/test_01_basics.py
+          python3 -m pytest --cov=pygem -v --durations=20 pygem/tests/test_02_config.py
+          python3 -m pytest --cov=pygem -v --durations=20 pygem/tests/test_03_notebooks.py
+          python3 -m pytest --cov=pygem -v --durations=20 pygem/tests/test_04_auxiliary.py
+          python3 -m pytest --cov=pygem -v --durations=20 pygem/tests/test_05_postproc.py

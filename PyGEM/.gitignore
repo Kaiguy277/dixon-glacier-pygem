@@ -1,0 +1,9 @@
+# Subdirectories
+__pycache__/
+sample_data/
+.vscode/
+
+# python bytecode
+*.pyc
+
+*.DS_Store
