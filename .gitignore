@@ -21,8 +21,10 @@ inputs/thickness/*.tif
 sweep_analysis_full_*.csv
 analysis_results/sweep_analysis_results.csv
 
-# Old test analysis directory (incomplete)
+# Analysis output directories (large, keep locally)
 graphs/analysis_20260128_112039/
+graphs/analysis_20260202_134440/
+graphs/analysis_20260202_142027/
 
 # IDE
 .idea/

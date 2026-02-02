@@ -29,7 +29,7 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 # Configuration
-SWEEP_DIR = Path("/media/kai/Extreme SSD/Linux_Pygem/expanded_sweep/calibration_expanded_20260122_220448")
+SWEEP_DIR = Path("/media/kai/Extreme SSD/Linux_Pygem/targeted_sweep/targeted_extended_20260128_154200")
 OBS_FILE = Path("/home/kai/Documents/PYGEM/inputs/stake_observations_dixon.csv")
 GRAPHS_BASE_DIR = Path("/home/kai/Documents/PYGEM/graphs")
 
@@ -633,14 +633,14 @@ def plot_monthly_timeseries(sweep_dir, results_df, obs_dict, output_dir, sweep_n
         ax1.set_ylabel('Monthly Mass Balance (m w.e.)')
         ax1.set_title(f'{zone} Zone - Monthly Mass Balance\n'
                      f'Elevation: {elev}m | Bin Index: {bin_idx} | Top {n_best} runs by RMSE')
-        ax1.legend(loc='upper left', fontsize=8, ncol=2)
+        # ax1.legend(loc='upper left', fontsize=8, ncol=2)  # Removed - blocks data with 100 runs
         ax1.grid(True, alpha=0.3)
         ax1.axhline(0, color='black', linewidth=0.5)
 
         ax2.set_xlabel('Date')
         ax2.set_ylabel('Cumulative Mass Balance (m w.e.)\n(normalized to 0 at Fall 2022)')
         ax2.set_title(f'{zone} Zone - Cumulative Mass Balance (from Fall 2022)')
-        ax2.legend(loc='upper left', fontsize=8, ncol=2)
+        # ax2.legend(loc='upper left', fontsize=8, ncol=2)  # Removed - blocks data with 100 runs
         ax2.grid(True, alpha=0.3)
         ax2.axhline(0, color='black', linewidth=0.5)
 
@@ -827,7 +827,7 @@ def main():
         plot_results(results_df, obs_dict, output_dirs, sweep_name)
         print("\nGenerating monthly time series plots...")
         plot_monthly_timeseries(SWEEP_DIR, results_df, obs_dict, output_dirs['timeseries'],
-                               sweep_name, n_best=5, seasonal_dict=seasonal_dict)
+                               sweep_name, n_best=100, seasonal_dict=seasonal_dict)
 
     print("\n" + "=" * 70)
     print("ANALYSIS COMPLETE")
