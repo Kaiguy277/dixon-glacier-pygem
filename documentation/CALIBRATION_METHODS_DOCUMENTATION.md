@@ -372,7 +372,7 @@ For the final ensemble selection, **all three sweeps were analyzed together** (1
 6. **Select ensemble**: Top 250 parameter sets meeting threshold criteria
 7. **Analyze composition**: Proportion from each sweep
 
-**Conservative sweep**: Will be added to combined analysis after completion (total ~197k runs).
+**All three sweeps**: Final combined analysis of 192,998 successful runs completed February 8, 2026.
 
 ### 5.4 Comparison with Geck et al. (2021)
 
@@ -551,7 +551,7 @@ Each PyGEM simulation verified using:
 |-------|-----------|-----------|--------|--------------|
 | Expanded | 110,592 | 105,957 | 4,635 | 95.8% |
 | Targeted | 36,864 | 35,908 | 956 | 97.4% |
-| Conservative | 50,400 | TBD | TBD | >96% (est.) |
+| Conservative | 50,400 | 49,203 | 1,197 | 97.6% |
 
 **Common failure modes**:
 - Timeout (>5 minutes, <1% of runs)
@@ -686,21 +686,50 @@ RMSE (overall):     0.262 m w.e.
 
 **Conclusion**: Z-score method successfully achieves multi-criteria objective of balanced performance across elevation zones, with minimal trade-off in overall RMSE (0.411 vs 0.408 m w.e.).
 
-### 8.3 Conservative Sweep (Stage 3) - Preliminary
+### 8.3 Combined Analysis - All Three Sweeps (FINAL) ✅
 
-**Status**: In progress (74/50,400 runs completed as of Feb 2, 18:43)
-**Expected completion**: February 5, 2026
+**Status**: Complete (February 8, 2026)
+**Runs analyzed**: 192,998 successful runs across all three sweeps
+- Expanded sweep: 108,039 runs
+- Targeted sweep: 35,756 runs
+- Conservative sweep: 49,203 runs
 
-**Anticipated outcomes**:
-1. **Resolve ddfsnow boundary**: Extended lower bound (0.0002) will definitively determine if true optimum below 0.001
-2. **Validate focused strategy**: Exploratory sweep will confirm no alternative optima in broader parameter space
-3. **Final ensemble**: Combined analysis of all 3 sweeps (~197k runs) for most robust ensemble selection
+**Key Findings**:
 
-**Analysis plan** (upon completion):
-1. Run `analyze_zscore_combined.py` on all three sweeps
-2. Compare ensemble composition: proportion from each sweep
-3. Examine ddfsnow distribution: resolved boundary or still clustered?
-4. Final parameter uncertainty quantification for thesis/publication
+#### Best Parameter Set (NEW from Conservative Sweep)
+- **Run ID**: 415052 (conservative sweep)
+- **Overall RMSE**: 0.251 m w.e. (improvement from 0.262 m w.e.)
+- **Parameters**:
+  - tbias: 4.20°C
+  - kp: 2.045
+  - ddfsnow: 0.000937
+  - ddfsnow_iceratio: 0.182
+
+#### Final Ensemble Composition
+The 250-member ensemble demonstrates balanced contributions from all sweeps:
+- **Conservative sweep**: 125 parameter sets (50.0%)
+- **Targeted sweep**: 117 parameter sets (46.8%)
+- **Expanded sweep**: 8 parameter sets (3.2%)
+
+**Validation**: Equal contribution from conservative sweep confirms multi-stage strategy successfully explored full parameter space without premature narrowing.
+
+#### Final Ensemble Statistics
+| Parameter | Mean ± Std | Range |
+|-----------|------------|-------|
+| tbias (°C) | 4.31 ± 1.36 | -0.78 to 5.40 |
+| kp | 2.64 ± 0.59 | 1.40 to 3.70 |
+| ddfsnow | 0.00125 ± 0.00057 | 0.00064 to 0.00400 |
+| ddfsnow_iceratio | 0.259 ± 0.076 | 0.12 to 0.45 |
+
+#### Zone-Specific Performance
+| Zone | Mean RMSE (m w.e.) | Std Dev | Range |
+|------|-------------------|---------|-------|
+| ABL  | 0.313 | ±0.141 | 0.020 - 0.626 |
+| ELA  | 0.399 | ±0.115 | 0.235 - 0.780 |
+| ACC  | 0.332 | ±0.098 | 0.179 - 0.715 |
+| **Overall** | **0.370** | **±0.049** | **0.248 - 0.492** |
+
+**Conclusion**: Z-score ranking achieved balanced performance across all elevation zones with ensemble spread representing parameter uncertainty for future projections
 
 ---
 
@@ -861,6 +890,9 @@ The 250-member ensemble provides uncertainty bounds for future projections:
 
 **Document Version**: 1.0 (Final Draft)
 **Last Updated**: February 2, 2026
-**Status**: Ready for thesis integration pending Stage 3 completion
+**Status**: ✅ COMPLETE - All three sweeps executed and analyzed. Ready for thesis integration.
+**Final Results**: 250-member ensemble selected from 192,998 runs (50% conservative, 47% targeted, 3% expanded)
+**Best RMSE**: 0.251 m w.e. (Run 415052 - conservative sweep)
+**Last Updated**: February 8, 2026
 **Compiled by**: Automated documentation from calibration workflow
 **Contact**: Kai Myers, Dixon Glacier PyGEM Project

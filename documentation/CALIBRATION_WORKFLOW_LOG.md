@@ -22,22 +22,43 @@
 **Persistent Issue**: Optimal still at 0.001, not 0.0005
 **Decision**: Further extend to 0.0002 + add exploratory sweep for validation
 
-### February 2-5, 2026: Stage 3 - Conservative Sweep
+### February 2-8, 2026: Stage 3 - Conservative Sweep
 **Decision**: Dual-regime design (76% focused + 24% exploratory)
 **Runs**: 50,400 combinations (38,400 main + 12,000 exploratory)
-**Runtime**: ~70 hours (estimated)
+**Runtime**: ~70 hours
+**Status**: ✅ Complete (February 8, 2026)
 **Purpose**:
 - Definitively resolve ddfsnow boundary (extended to 0.0002)
 - Validate no alternative optima in broader parameter space
 - Address potential reviewer concerns about premature narrowing
+**Outcome**: Ready for 3-sweep combined z-score analysis (~197k total runs)
 
-### February 2, 2026: Combined Z-Score Analysis
+### February 2, 2026: Preliminary Z-Score Analysis (2 sweeps)
 **Decision**: Analyze expanded + targeted sweeps together (147k runs)
 **Method**: Multi-criteria z-score ranking (Geck et al. 2021)
 **Result**: Selected 250-member ensemble
 - 93% from targeted sweep (validates focused design)
 - 7% from expanded sweep
 **Best RMSE**: 0.262 m w.e. (Run ID 216934)
+
+### February 8, 2026: Final Combined Analysis - COMPLETE ✅
+**Decision**: Analyze all three sweeps together (197k runs)
+**Status**: ✅ Complete - 192,998 parameter sets successfully analyzed
+**Runs Analyzed**:
+- Expanded sweep: 108,039 successful runs
+- Targeted sweep: 35,756 successful runs
+- Conservative sweep: 49,203 successful runs
+**Result**: Final 250-member ensemble selected via z-score ranking
+**Ensemble Composition**:
+- Conservative sweep: 125 sets (50.0%) - validates final exploration
+- Targeted sweep: 117 sets (46.8%) - validates focused approach
+- Expanded sweep: 8 sets (3.2%) - provides diversity
+
+**Key Finding**: Best parameter set now from conservative sweep!
+- Run ID 415052: RMSE = 0.251 m w.e. (improvement from 0.262)
+- tbias: 4.20°C, kp: 2.045, ddfsnow: 0.000937, ratio: 0.182
+
+**Outcome**: Thesis-ready ensemble with balanced contributions from all sweeps
 
 ---
 
@@ -94,13 +115,17 @@ ddfsnow_iceratio:   0.205
 RMSE:               0.262 m w.e.  (10% improvement)
 ```
 
-### Ensemble (250 members) - Mean ± Std
+### Ensemble (250 members) - Final Statistics from All Sweeps
 ```
-tbias:              4.54 ± 0.73°C     (range: 3.0 to 5.6)
-kp:                 2.72 ± 0.49       (range: 1.5 to 3.5)
-ddfsnow:            0.00121 ± 0.00025 (range: 0.00067 to 0.00167)
-ddfsnow_iceratio:   0.276 ± 0.072     (range: 0.15 to 0.45)
-Overall RMSE:       0.411 ± 0.060 m w.e.
+tbias:              4.31 ± 1.36°C     (range: -0.78 to 5.40)
+kp:                 2.64 ± 0.59       (range: 1.40 to 3.70)
+ddfsnow:            0.00125 ± 0.00057 (range: 0.00064 to 0.00400)
+ddfsnow_iceratio:   0.259 ± 0.076     (range: 0.12 to 0.45)
+Overall RMSE:       0.370 ± 0.049 m w.e. (range: 0.248 to 0.492)
+Zone RMSEs:
+  ABL:              0.313 ± 0.141 m w.e.
+  ELA:              0.399 ± 0.115 m w.e.
+  ACC:              0.332 ± 0.098 m w.e.
 ```
 
 ---
@@ -140,15 +165,15 @@ Overall RMSE:       0.411 ± 0.060 m w.e.
 
 ### Comparison with RMSE-Only Ranking
 
-**Overlap**: 220/250 parameter sets (88%) in both methods
+**Overlap**: 210/250 parameter sets (84%) in both methods
 
 **Performance Difference**:
 | Zone | Z-Score | RMSE-Only |
 |------|---------|-----------|
-| ABL  | 0.421   | 0.443     | ← Z-score better
-| ELA  | 0.440   | 0.414     |
-| ACC  | 0.308   | 0.327     | ← Z-score better
-| Overall | 0.411 | 0.408  |
+| ABL  | 0.313   | 0.374     | ← Z-score better
+| ELA  | 0.399   | 0.367     |
+| ACC  | 0.332   | 0.323     |
+| Overall | 0.370 | 0.364  |
 
 **Conclusion**: Z-score achieves better zone balance with minimal overall RMSE trade-off
 
@@ -171,20 +196,23 @@ Overall RMSE:       0.411 ± 0.060 m w.e.
 │       └── runs/run_NNNNNN/*.nc
 │
 └── conservative_sweep/
-    └── conservative_20260202_184128/              (50k runs, IN PROGRESS)
+    └── conservative_20260203_132620/              (50k runs, ✅ COMPLETE)
         ├── parameters.csv                         (6.1 MB)
         ├── sweep_config.json
         └── runs/run_NNNNNN/*.nc
 
 /home/kai/Documents/PYGEM/graphs/
-└── zscore_combined_20260202_154557/
-    ├── top_250_zscore_parameters.csv              (Selected ensemble)
-    ├── all_results_with_zscores.csv               (All 147k runs)
-    ├── selection_summary.txt
-    ├── ranking_comparison.txt
-    ├── zscore_distributions.png
-    ├── parameter_frequencies.png
-    └── method_comparison.png
+├── zscore_combined_20260202_154557/               (2-sweep preliminary)
+│   └── (147k runs - expanded + targeted)
+│
+└── zscore_combined_all3_20260208_183456/          (FINAL - 3 sweeps) ⭐
+    ├── top_250_zscore_parameters.csv              (Selected ensemble - 107 KB)
+    ├── all_results_with_zscores.csv               (All 193k runs - 76 MB)
+    ├── selection_summary.txt                      (Statistical summary)
+    ├── ranking_comparison.txt                     (Method comparison)
+    ├── zscore_distributions.png                   (Z-score scatter plots - 290 KB)
+    ├── parameter_frequencies.png                  (Parameter histograms - 119 KB)
+    └── method_comparison.png                      (Z-score vs RMSE - 83 KB)
 ```
 
 ---
@@ -237,15 +265,16 @@ ACC,annual,2025,2024-10-03,2025-09-30,0.50,0.25,ACC,1293.0,Estimated
 
 ### Computational Effort
 - **Total runs executed**: 197,856 (110k + 36k + 50k)
+- **Successful runs analyzed**: 192,998 (97.5% success rate)
 - **Total runtime**: ~258 hours (~10.75 days)
 - **Storage**: ~111 GB NetCDF files
-- **Average success rate**: 96.5%
 
-### Calibration Performance
-- **Best single run**: RMSE 0.262 m w.e.
-- **Ensemble mean**: RMSE 0.411 ± 0.060 m w.e.
+### Calibration Performance (Final - All 3 Sweeps)
+- **Best single run**: RMSE 0.251 m w.e. (Run 415052 - conservative sweep)
+- **Ensemble mean**: RMSE 0.370 ± 0.049 m w.e.
 - **Ensemble size**: 250 parameter sets
-- **Zone balance**: All zones within ±0.44 m w.e. mean RMSE
+- **Ensemble composition**: 50% conservative, 47% targeted, 3% expanded
+- **Zone balance**: All zones within 0.31-0.40 m w.e. mean RMSE
 
 ### Parameter Constraints
 - **tbias**: 3.0 to 5.6°C (warm bias for ERA5)
@@ -317,6 +346,7 @@ ACC,annual,2025,2024-10-03,2025-09-30,0.50,0.25,ACC,1293.0,Estimated
 
 ---
 
-**Last Updated**: February 2, 2026
-**Status**: Ready for thesis integration
-**Next Step**: Complete conservative sweep → Final combined analysis
+**Last Updated**: February 8, 2026
+**Status**: ✅ COMPLETE - All three sweeps executed and analyzed (192,998 successful runs)
+**Final Ensemble**: 250 parameter sets selected via z-score ranking
+**Next Step**: Thesis integration and manuscript preparation

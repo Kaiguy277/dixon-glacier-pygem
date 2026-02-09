@@ -3,10 +3,12 @@
 Combined Z-Score Analysis for Dixon Glacier
 ============================================
 
-Analyzes both expanded sweep (110k runs) and targeted sweep (36k runs)
-together using z-score methodology following Geck et al. (2021).
+Analyzes ALL THREE sweeps using z-score methodology following Geck et al. (2021):
+- Expanded sweep: 110k runs
+- Targeted sweep: 36k runs
+- Conservative sweep: 50k runs
 
-Total: ~147k parameter combinations
+Total: ~197k parameter combinations
 """
 
 import sys
@@ -28,14 +30,15 @@ from analyze_sweep_results import (
 # Sweep directories
 EXPANDED_SWEEP = Path("/media/kai/Extreme SSD/Linux_Pygem/expanded_sweep/calibration_expanded_20260122_220448")
 TARGETED_SWEEP = Path("/media/kai/Extreme SSD/Linux_Pygem/targeted_sweep/targeted_extended_20260128_154200")
+CONSERVATIVE_SWEEP = Path("/media/kai/Extreme SSD/Linux_Pygem/conservative_sweep/conservative_20260203_132620")
 
 # Output
-OUTPUT_BASE = GRAPHS_BASE_DIR / f"zscore_combined_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+OUTPUT_BASE = GRAPHS_BASE_DIR / f"zscore_combined_all3_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
 
 def load_combined_sweeps():
-    """Load and combine parameters from both sweeps."""
-    print("Loading parameters from both sweeps...")
+    """Load and combine parameters from all three sweeps."""
+    print("Loading parameters from all three sweeps...")
 
     # Load expanded sweep
     expanded_params = pd.read_csv(EXPANDED_SWEEP / "parameters.csv")
@@ -49,11 +52,17 @@ def load_combined_sweeps():
     targeted_params['runs_dir'] = str(TARGETED_SWEEP / "runs")
     print(f"  Targeted sweep: {len(targeted_params):,} parameter sets")
 
-    # Combine
-    # Need to renumber run_ids to avoid conflicts
-    targeted_params['run_id'] = targeted_params['run_id'] + 200000  # Offset to avoid overlap
+    # Load conservative sweep
+    conservative_params = pd.read_csv(CONSERVATIVE_SWEEP / "parameters.csv")
+    conservative_params['sweep_source'] = 'conservative'
+    conservative_params['runs_dir'] = str(CONSERVATIVE_SWEEP / "runs")
+    print(f"  Conservative sweep: {len(conservative_params):,} parameter sets")
 
-    combined = pd.concat([expanded_params, targeted_params], ignore_index=True)
+    # Combine - need to renumber run_ids to avoid conflicts
+    targeted_params['run_id'] = targeted_params['run_id'] + 200000  # Offset
+    conservative_params['run_id'] = conservative_params['run_id'] + 400000  # Offset
+
+    combined = pd.concat([expanded_params, targeted_params, conservative_params], ignore_index=True)
     print(f"  Combined total: {len(combined):,} parameter sets")
 
     return combined
@@ -85,9 +94,12 @@ def calculate_combined_rmse(params_df, obs_dict):
         if sweep_source == 'expanded':
             actual_run_id = run_id
             run_dir = EXPANDED_SWEEP / "runs" / f"run_{actual_run_id:06d}"
-        else:  # targeted
+        elif sweep_source == 'targeted':
             actual_run_id = run_id - 200000  # Remove offset
             run_dir = TARGETED_SWEEP / "runs" / f"run_{actual_run_id:06d}"
+        else:  # conservative
+            actual_run_id = run_id - 400000  # Remove offset
+            run_dir = CONSERVATIVE_SWEEP / "runs" / f"run_{actual_run_id:06d}"
 
         # Load binned output
         binned_file = list(run_dir.glob("*binned.nc"))

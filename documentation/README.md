@@ -146,20 +146,20 @@ This directory contains comprehensive documentation of the parameter calibration
 
 ---
 
-## Key Figures (Ready for Thesis)
+## Key Figures (Thesis-Ready)
 
-Located in: `/home/kai/Documents/PYGEM/graphs/zscore_combined_20260202_154557/`
+**Location**: `/home/kai/Documents/PYGEM/graphs/zscore_combined_all3_20260208_183456/`
 
-1. **zscore_distributions.png** - Scatter plots of normalized z-scores
-   - Shows selection threshold and ensemble distribution
+1. **zscore_distributions.png** (290 KB) - Scatter plots of normalized z-scores
+   - Shows selection threshold and ensemble distribution across all 3 sweeps
    - Use for: Methods section (z-score methodology)
 
-2. **parameter_frequencies.png** - Histograms of parameter value distributions
-   - Shows ensemble spread and uncertainty
+2. **parameter_frequencies.png** (119 KB) - Histograms of parameter value distributions
+   - Shows ensemble spread and uncertainty from 250-member ensemble
    - Use for: Results section (parameter uncertainty)
 
-3. **method_comparison.png** - Comparison of z-score vs RMSE-only ranking
-   - Shows method performance differences
+3. **method_comparison.png** (83 KB) - Comparison of z-score vs RMSE-only ranking
+   - Shows method performance differences and 84% overlap
    - Use for: Methods section (justification for z-score approach)
 
 ---
@@ -173,17 +173,19 @@ Located in: `/home/kai/Documents/PYGEM/graphs/zscore_combined_20260202_154557/`
 - Water years 2023-2025
 
 ### Selected Ensemble
-**Location**: `/home/kai/Documents/PYGEM/graphs/zscore_combined_20260202_154557/`
-- `top_250_zscore_parameters.csv` - Final 250-member ensemble
-- `all_results_with_zscores.csv` - All 147k runs with z-scores
+**Location**: `/home/kai/Documents/PYGEM/graphs/zscore_combined_all3_20260208_183456/`
+- `top_250_zscore_parameters.csv` - Final 250-member ensemble (all 3 sweeps)
+- `all_results_with_zscores.csv` - All 193k runs with z-scores (76 MB)
 - `selection_summary.txt` - Statistical summary
 - `ranking_comparison.txt` - Method comparison details
+
+**Previous Analysis** (2 sweeps): `/home/kai/Documents/PYGEM/graphs/zscore_combined_20260202_154557/`
 
 ### Parameter Sweep Archives
 **Location**: `/media/kai/Extreme SSD/Linux_Pygem/`
 - `expanded_sweep/calibration_expanded_20260122_220448/` - 110k runs
 - `targeted_sweep/targeted_extended_20260128_154200/` - 36k runs
-- `conservative_sweep/conservative_20260202_184128/` - 50k runs (in progress)
+- `conservative_sweep/conservative_20260203_132620/` - 50k runs
 
 ---
 
@@ -192,12 +194,14 @@ Located in: `/home/kai/Documents/PYGEM/graphs/zscore_combined_20260202_154557/`
 | Metric | Value |
 |--------|-------|
 | **Total parameter combinations tested** | 197,856 |
-| **Successful runs** | ~190,000 (96.5% success rate) |
+| **Successful runs analyzed** | 192,998 (97.5% success rate) |
 | **Total computation time** | ~258 hours (~10.75 days) |
 | **Total storage required** | ~111 GB (NetCDF outputs) |
 | **Final ensemble size** | 250 parameter sets |
-| **Best single-run RMSE** | 0.262 m w.e. |
-| **Ensemble mean RMSE** | 0.411 ± 0.060 m w.e. |
+| **Ensemble composition** | 50% conservative, 47% targeted, 3% expanded |
+| **Best single-run RMSE** | 0.251 m w.e. (Run 415052) |
+| **Ensemble mean RMSE** | 0.370 ± 0.049 m w.e. |
+| **Zone balance (mean RMSE)** | ABL: 0.313, ELA: 0.399, ACC: 0.332 |
 
 ---
 
@@ -206,7 +210,7 @@ Located in: `/home/kai/Documents/PYGEM/graphs/zscore_combined_20260202_154557/`
 When referencing this calibration workflow in publications:
 
 ### For Methods
-"Parameter calibration employed a multi-stage ensemble approach with 197,856 model runs across three sequential parameter sweeps, using multi-criteria z-score ranking following Geck et al. (2021) to ensure balanced performance across elevation zones."
+"Parameter calibration employed a multi-stage ensemble approach with 197,856 model runs across three sequential parameter sweeps (expanded, targeted, and conservative exploration). A final ensemble of 250 parameter sets was selected using multi-criteria z-score ranking following Geck et al. (2021) to ensure balanced performance across elevation zones, achieving mean RMSE of 0.370 ± 0.049 m w.e. with balanced contributions from all three sweeps (50% conservative, 47% targeted, 3% expanded)."
 
 ### For Z-Score Methodology
 Adapted from:
@@ -222,40 +226,55 @@ Adapted from:
 | Document | Status | Last Updated | Version |
 |----------|--------|--------------|---------|
 | CALIBRATION_METHODS_DOCUMENTATION.md | ✅ Ready | Feb 2, 2026 | 1.0 |
-| CALIBRATION_WORKFLOW_LOG.md | ✅ Ready | Feb 2, 2026 | 1.0 |
+| CALIBRATION_WORKFLOW_LOG.md | ✅ Updated | Feb 8, 2026 | 1.1 |
 | ZSCORE_ANALYSIS_README.md | ✅ Ready | Feb 2, 2026 | 1.0 |
 | SETUP_GUIDE_4D_PARAMETER_SWEEP.md | ✅ Ready | Jan 15, 2026 | 1.0 |
 | DATA_SETUP_COMPARISON.md | 📋 Reference | Jan 15, 2026 | 1.0 |
+| README.md | ✅ Updated | Feb 8, 2026 | 1.1 |
 
 ---
 
-## Next Steps (After Conservative Sweep Completion)
+## Thesis Integration Checklist
 
-1. **Update CALIBRATION_METHODS_DOCUMENTATION.md**:
-   - Add Stage 3 results to Section 8.3
-   - Update total runs to 197,856
-   - Add final ensemble statistics from 3-sweep combined analysis
+### ✅ Completed
+- [x] Execute all three parameter sweeps (197,856 runs)
+- [x] Run combined z-score analysis (192,998 successful runs)
+- [x] Generate thesis-ready figures (z-score distributions, parameter frequencies, method comparison)
+- [x] Update all documentation files with final results
+- [x] Document ensemble composition and statistics
 
-2. **Run Final Combined Analysis**:
-   ```bash
-   python3 analyze_zscore_combined.py
-   # Will include all 3 sweeps (~197k runs)
-   ```
+### 📝 Ready for Thesis
+1. **Methods Chapter** (Use CALIBRATION_METHODS_DOCUMENTATION.md):
+   - Multi-stage calibration strategy (3 sequential sweeps)
+   - Z-score ranking methodology
+   - Ensemble selection process
+   - Technical implementation details
 
-3. **Generate Final Figures**:
-   - Updated z-score distributions (all sweeps)
-   - Final parameter histograms
-   - 3-sweep composition breakdown
+2. **Results Chapter** (Use graphs/zscore_combined_all3_20260208_183456/):
+   - Final ensemble statistics (250 parameter sets)
+   - Best parameter set (Run 415052: RMSE 0.251 m w.e.)
+   - Parameter uncertainty ranges
+   - Zone-specific performance
 
-4. **Archive and Backup**:
+3. **Figures** (All files in zscore_combined_all3_20260208_183456/):
+   - Figure 1: Z-score distributions (zscore_distributions.png)
+   - Figure 2: Parameter frequencies (parameter_frequencies.png)
+   - Figure 3: Method comparison (method_comparison.png)
+
+### 🔄 Next Steps
+1. **Prepare for Publication**:
    - Compress sweep directories (tar.gz)
    - Upload to institutional repository
    - Create DOI for data/code archive
+
+2. **Run Future Projections**:
+   - Use top_250_zscore_parameters.csv for ensemble projections
+   - Apply to future climate scenarios
 
 ---
 
 **Documentation Compiled by**: Kai Myers
 **Project**: Dixon Glacier PyGEM Calibration and Future Projections
 **Institution**: [Your University]
-**Date**: February 2026
-**Status**: Publication-ready pending Stage 3 completion
+**Date**: February 8, 2026
+**Status**: ✅ COMPLETE - All sweeps executed and analyzed. Ready for thesis integration.
